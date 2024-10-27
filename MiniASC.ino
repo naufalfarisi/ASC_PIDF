@@ -184,13 +184,13 @@ void handleSerialInput(void *pvParameters) {
 //        T_Drive(100); 
       }
       if (data_in == '2') { // Right Direction Pressed
-        T_Drive(-150);
+        T_Drive(150);
       }
       if (data_in == '3') { // Down Direction Pressed
         G_Drive(-150);
       }
       if (data_in == '4') { // Left Direction Pressed
-        T_Drive(150);
+        T_Drive(-150);
       }
       if (data_in == '0') { // 4-way Pad Released
         G_Drive(0);           
@@ -333,17 +333,16 @@ void PID_G_Drive(int speed) { // min 110 max 220
 //  else if (speed < 0 && speed > -110) speed = -120; // Batas kecepatan negatif
 //  else if (speed <= 0) speed = 0;
   if (speed > 0) { // Motor maju
-      if(!speedSet){
         digitalWrite(G_IN1, LOW);
         digitalWrite(G_IN2, HIGH);
         digitalWrite(G_IN3, LOW);
         digitalWrite(G_IN4, HIGH);
-        for (float i = 1; i <= abs(speed); i += 0.5) {
-          analogWrite(G_ENA, int(i));
-          analogWrite(G_ENB, int(i));
-        Gspeed = i;
-//      vTaskDelay(10 / portTICK_PERIOD_MS);
-    }
+//        for (float i = 1; i <= abs(speed); i += 0.5) {
+//          analogWrite(G_ENA, int(i));
+//          analogWrite(G_ENB, int(i));
+//        Gspeed = i;
+////      vTaskDelay(10 / portTICK_PERIOD_MS);
+//    }
     analogWrite(G_ENA, abs(speed));
     analogWrite(G_ENB, abs(speed));
     Gspeed = speed;
@@ -352,7 +351,6 @@ void PID_G_Drive(int speed) { // min 110 max 220
     motorState[1] = HIGH;
     motorState[2] = LOW;
     motorState[3] = HIGH;
-        }
       speedSet=true;
     
 
@@ -549,7 +547,7 @@ void logDataCont(void *pvParameters){
     Serial.print(',');
     Serial.print(valueY);
     Serial.print(',');
-    Serial.print(angleX);
+    Serial.println(angleX);
     Serial.print(',');
     Serial.print(angleY);
     Serial.print(',');
@@ -625,19 +623,19 @@ void DisplayPM(void *pvParameters){
   angleX = map(valueX, 170, 874, -90, 90);
   angleX = angleX - 3;
   angleY = map(valueY, 170, 874, -90, 90);
-//  Serial.print("X= ") ;
-//  Serial.print(valueX) ;
-//  Serial.print("\t"); 
-//  Serial.print("X DEGREE= ");
-//  Serial.print(angleX);  
-//  Serial.print(" Y= ") ;jjjj
-//  Serial.print(valueY) ;
-//  Serial.print("\t"); 
-//  Serial.print("X DEGREE= ");
-//  Serial.print(angleX);
-//  Serial.print("\t");
-//  Serial.print("Y DEGREE=");
-//  Serial.println(angleY);
+  Serial.print("X= ") ;
+  Serial.print(valueX) ;
+  Serial.print("\t"); 
+  Serial.print("X DEGREE= ");
+  Serial.print(angleX);  
+  Serial.print(" Y= ") ;jjjj
+  Serial.print(valueY) ;
+  Serial.print("\t"); 
+  Serial.print("X DEGREE= ");
+  Serial.print(angleX);
+  Serial.print("\t");
+  Serial.print("Y DEGREE=");
+  Serial.println(angleY);
   vTaskDelay(100 / portTICK_PERIOD_MS);
     }
   }
@@ -667,7 +665,7 @@ void autonomous(void *pvParameters) {
     
     // Cek kondisi untuk menghentikan motor Gantry
     if (remainingToFDistance <= 20) {
-//      PID_G_Drive(0);
+      PID_G_Drive(0);
 //      Setpoint = 0;
     }
     
@@ -678,9 +676,9 @@ void autonomous(void *pvParameters) {
     
     // Jika kedua kondisi terpenuhi, hentikan task
     if (remainingToFDistance <= 0 && remainingEncoderDistance <= 0) {
-      PID_G_Drive(0);
+//      PID_G_Drive(0);
       T_Drive(0);
-      break;
+//      break;
     }
     
     vTaskDelay(10 / portTICK_PERIOD_MS); // Delay kecil untuk memberikan waktu eksekusi untuk task lain
@@ -838,5 +836,4 @@ void updatePIDGains(double distance, double angle) {
   // Defuzzifikasi untuk mendapatkan Kp
   Kp = defuzzifyKp(ruleOutputsKp, ruleStrengthsKp, 9);
   
-
 }
